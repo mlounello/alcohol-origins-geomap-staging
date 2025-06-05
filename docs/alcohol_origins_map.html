@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_3b685dc6c2b3feb2ca36333d23bc91ef {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+     <div style="
+       position: fixed; 
+       top: 10px; right: 10px; 
+       width: 150px; 
+       background-color: white;
+       border:2px solid gray; 
+       z-index:9999; 
+       font-size:14px;
+       line-height:18px;
+       padding: 10px;
+       box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
+     ">
+     <b>Legend</b><br>
+    
+         <i style="background:gold; width:12px; height:12px; display:inline-block; margin-right:6px;"></i>
+         Grain<br>
+        
+         <i style="background:purple; width:12px; height:12px; display:inline-block; margin-right:6px;"></i>
+         Grape<br>
+        
+         <i style="background:saddlebrown; width:12px; height:12px; display:inline-block; margin-right:6px;"></i>
+         Sugar<br>
+        
+         <i style="background:green; width:12px; height:12px; display:inline-block; margin-right:6px;"></i>
+         Cactus<br>
+        </div>
+    
+            <div class="folium-map" id="map_3b685dc6c2b3feb2ca36333d23bc91ef" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_3b685dc6c2b3feb2ca36333d23bc91ef = L.map(
+                "map_3b685dc6c2b3feb2ca36333d23bc91ef",
+                {
+                    center: [26.8206, 30.8025],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 2,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_f9f9ed8cd6b5ea8cef0e3ce09122c501 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_f9f9ed8cd6b5ea8cef0e3ce09122c501.addTo(map_3b685dc6c2b3feb2ca36333d23bc91ef);
+        
+    
+            var circle_marker_67b0f032288e9aabe984cc48e71cb99c = L.circleMarker(
+                [26.8206, 30.8025],
+                {"bubblingMouseEvents": true, "color": "gold", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "gold", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 5, "stroke": true, "weight": 3}
+            ).addTo(map_3b685dc6c2b3feb2ca36333d23bc91ef);
+        
+    
+        var popup_6222ac578e70c6a10732172bb9562220 = L.popup({
+  "maxWidth": 300,
+});
+
+        
+            
+                var html_3ad3026bdcd11f508d27dfbf004af013 = $(`<div id="html_3ad3026bdcd11f508d27dfbf004af013" style="width: 100.0%; height: 100.0%;">         <strong>beer_ancient_egypt</strong><br>         Type: beer<br>         Group: Grain<br>         Date: 3500 BCE<br>         Description: Earliest known evidence of beer production in ancient Egypt.<br>         Citation:          </div>`)[0];
+                popup_6222ac578e70c6a10732172bb9562220.setContent(html_3ad3026bdcd11f508d27dfbf004af013);
+            
+        
+
+        circle_marker_67b0f032288e9aabe984cc48e71cb99c.bindPopup(popup_6222ac578e70c6a10732172bb9562220)
+        ;
+
+        
+    
+</script>
+</html>
