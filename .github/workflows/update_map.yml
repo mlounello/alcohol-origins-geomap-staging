@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repo with GITHUB_TOKEN & persisted credentials
+      # 1) Check out the repo, with token so checkout config is ready
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -45,6 +45,8 @@ jobs:
 
       # 6) Commit and push docs/index.html if it changed
       - name: Commit and push changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Configure commit author
           git config --local user.name "github-actions[bot]"
@@ -56,6 +58,11 @@ jobs:
           # Only commit if there are staged changes
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update map at $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+
+            # Reset origin to use the GITHUB_TOKEN for authentication
+            git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/mlounello/alcohol-origins-geomap.git
+
+            # Push changes to main
             git push origin main
           else
             echo "No changes to index.html; skipping commit and push."
