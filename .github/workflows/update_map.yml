@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repo (with default GITHUB_TOKEN credentials)
+      # 1) Check out the repo with persisted credentials so GITHUB_TOKEN can push
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true  # ensures GITHUB_TOKEN is used for any git push
+          persist-credentials: true
 
       # 2) Reconstruct service-account JSON from secret
       - name: Write GCP Service Account JSON
@@ -42,7 +42,7 @@ jobs:
         run: |
           python create_map.py
 
-      # 6) Commit and push new docs/index.html if changed
+      # 6) Commit and push docs/index.html if it changed
       - name: Commit and push changes
         run: |
           # Configure commit author
@@ -52,9 +52,10 @@ jobs:
           # Stage the updated file
           git add docs/index.html
 
-          # If there are changes, commit and push
+          # Only commit if there are staged changes
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update map at $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            # Push using the token from checkout step
             git push origin main
           else
             echo "No changes to index.html; skipping commit and push."
