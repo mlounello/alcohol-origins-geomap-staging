@@ -27,7 +27,7 @@ def parse_year(date_str: str) -> int:
     if m2:
         century = int(m2.group(1))
         era = m2.group(2)
-        # approximate midpoint of that century: (century*100 - 50)
+        # approximate midpoint of that century: (century * 100 - 50)
         mid = (century * 100) - 50
         return -mid if era == "BCE" else mid
 
@@ -49,8 +49,9 @@ def compute_radius(year: int) -> int:
         return 5  # default radius if unknown
 
     # Map year range roughly from -5000 → 2000 into radius range 12 → 4
-    # linear interpolation: r = m * year + b, but flipped because BCE negative
-    # For year = -5000 → want radius ~12; year = 2000 → radius ~4
+    # r = m * year + b, where:
+    #   For year = -5000 → radius ~12
+    #   For year = 2000  → radius ~4
     m = (4 - 12) / (2000 - (-5000))  # slope
     b = 12 - (m * -5000)
     r = m * year + b
@@ -95,7 +96,6 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     Convert latitude/longitude columns to floats and drop rows missing valid coords.
     Also compute numeric 'year' and 'radius' columns for each row.
     """
-    # Convert lat/long to numeric
     df["latitude"] = pd.to_numeric(df["latitude"], errors="coerce")
     df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
     df = df.dropna(subset=["latitude", "longitude"]).reset_index(drop=True)
@@ -170,7 +170,6 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
       • A searchable GeoJSON layer for node_id
       • An enhanced legend
     """
-    # 1) Define colors for each group
     group_color_map = {
         "Grain": "gold",
         "Grape": "purple",
@@ -178,28 +177,38 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         "Cactus": "green"
     }
 
-    # 2) Compute map center
     center_lat = df["latitude"].mean()
     center_lon = df["longitude"].mean()
     m = folium.Map(location=[center_lat, center_lon], zoom_start=2)
 
-    # 3) Draw parent→child lines first
+    # Draw lines first
     add_parent_child_lines(m, df)
 
-    # 4) Build a GeoJSON FeatureCollection so we can use the Search plugin
+    # Add individual CircleMarkers (with radius)
+    for _, row in df.iterrows():
+        color = group_color_map.get(row["group"], "blue")
+        folium.CircleMarker(
+            location=[row["latitude"], row["longitude"]],
+            radius=row["radius"],
+            color=color,
+            fill=True,
+            fill_color=color,
+            fill_opacity=0.7,
+            popup=folium.Popup(
+                f"<strong>{row['node_id']}</strong><br>"
+                f"Type: {row['type']}<br>"
+                f"Group: {row['group']}<br>"
+                f"Date: {row['date']}<br>"
+                f"Description: {row['description']}<br>"
+                f"Citation: {row['citation']}",
+                max_width=300
+            )
+        ).add_to(m)
+
+    # Build a minimal GeoJSON for Search (only node_id + coordinates)
     features = []
     for _, row in df.iterrows():
-        # Prepare properties for popup and styling
-        props = {
-            "node_id": row["node_id"],
-            "type": row["type"],
-            "group": row["group"],
-            "date": row["date"],
-            "description": row["description"],
-            "citation": row["citation"],
-            "color": group_color_map.get(row["group"], "blue"),
-            "radius": row["radius"]
-        }
+        props = {"node_id": row["node_id"]}
         feature = {
             "type": "Feature",
             "properties": props,
@@ -215,48 +224,16 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         "features": features
     }
 
-    # 5) Add the GeoJSON layer with CircleMarker styling via point_to_layer
-    def style_function(feature):
-        # Not used for CircleMarker, kept if needed for polygons
-        return {}
-
-    def point_to_layer(feature, latlng):
-        return folium.CircleMarker(
-            location=latlng,
-            radius=feature["properties"]["radius"],
-            color=feature["properties"]["color"],
-            fill=True,
-            fill_color=feature["properties"]["color"],
-            fill_opacity=0.7,
-            popup=folium.Popup(
-                f"<strong>{feature['properties']['node_id']}</strong><br>"
-                f"Type: {feature['properties']['type']}<br>"
-                f"Group: {feature['properties']['group']}<br>"
-                f"Date: {feature['properties']['date']}<br>"
-                f"Description: {feature['properties']['description']}<br>"
-                f"Citation: {feature['properties']['citation']}",
-                max_width=300
-            )
-        )
-
-    geojson_layer = folium.GeoJson(
-        data=geojson_data,
-        name="All Nodes",
-        style_function=style_function,
-        point_to_layer=point_to_layer,
-        tooltip=folium.GeoJsonTooltip(fields=["node_id"], aliases=["Node ID:"])
-    )
-    geojson_layer.add_to(m)
-
-    # 6) Add the Search box, searching by node_id
+    # Add Search plugin, powered by our minimal GeoJSON
     Search(
-        layer=geojson_layer,
-        search_label="node_id",
-        placeholder="Search Node ID...",
+        data=geojson_data,
+        geom_type='Point',
+        search_label='node_id',
+        placeholder='Search Node ID...',
         collapsed=False
     ).add_to(m)
 
-    # 7) Inject the enhanced legend
+    # Inject the enhanced legend
     add_legend(m, group_color_map)
 
     return m
@@ -265,17 +242,14 @@ def main():
     SHEET_ID = "1obKjWhdnJhK3f6qImN0DrQJEBZP-YigvjrU128QkjMM"
     WORKSHEET = "Sheet1"
 
-    # Load and prepare
     df = load_sheet_to_df(SHEET_ID, WORKSHEET)
     print("✅ Loaded sheet. Preparing DataFrame…")
     df = prepare_dataframe(df)
     print(f"✅ DataFrame ready: {len(df)} valid points.")
 
-    # Create map with all features
     fmap = create_folium_map(df)
     print("✅ Map with variable radii, search box, lines, and legend created.")
 
-    # Save to docs/index.html
     output_file = "docs/index.html"
     fmap.save(output_file)
     print(f"✅ Map saved to {output_file}.")
