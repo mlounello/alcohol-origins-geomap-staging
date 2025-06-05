@@ -224,10 +224,16 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         "features": features
     }
 
-    # Add Search plugin, powered by our minimal GeoJSON
-    Search(
+    # Add the GeoJSON layer
+    geojson_layer = folium.GeoJson(
         data=geojson_data,
-        geom_type='Point',
+        name="All Nodes"
+    )
+    geojson_layer.add_to(m)
+
+    # Add the Search plugin, referencing that geojson_layer
+    Search(
+        layer=geojson_layer,
         search_label='node_id',
         placeholder='Search Node ID...',
         collapsed=False
