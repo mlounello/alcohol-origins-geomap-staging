@@ -12,10 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repo with persisted credentials so GITHUB_TOKEN can push
+      # 1) Check out the repo with GITHUB_TOKEN & persisted credentials
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
 
       # 2) Reconstruct service-account JSON from secret
@@ -55,7 +56,6 @@ jobs:
           # Only commit if there are staged changes
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update map at $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
-            # Push using the token from checkout step
             git push origin main
           else
             echo "No changes to index.html; skipping commit and push."
