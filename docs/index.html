@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_2579d12b9e8ea2a8083e39886e83cfac {
+                #map_9015db9b01a562352de2c60eb9798f5b {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -50,22 +50,20 @@
             </script>
 
         
-    <script src="https://cdn.jsdelivr.net/npm/leaflet-search@2.9.7/dist/leaflet-search.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-search@2.9.7/dist/leaflet-search.min.css"/>
 </head>
 <body>
     
     
      <div style="
        position: fixed;
-       top: 10px; right: 10px;
+       bottom: 10px; right: 10px;
        width: 160px;
        background-color: rgba(255, 255, 255, 0.8);
-       border:2px solid gray;
+       border: 2px solid gray;
        border-radius: 8px;
-       z-index:9999;
-       font-size:14px;
-       line-height:18px;
+       z-index: 9999;
+       font-size: 14px;
+       line-height: 18px;
        padding: 8px;
        box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
      ">
@@ -84,14 +82,14 @@
          Cactus<br>
         </div>
     
-            <div class="folium-map" id="map_2579d12b9e8ea2a8083e39886e83cfac" ></div>
+            <div class="folium-map" id="map_9015db9b01a562352de2c60eb9798f5b" ></div>
         
 </body>
 <script>
     
     
-            var map_2579d12b9e8ea2a8083e39886e83cfac = L.map(
-                "map_2579d12b9e8ea2a8083e39886e83cfac",
+            var map_9015db9b01a562352de2c60eb9798f5b = L.map(
+                "map_9015db9b01a562352de2c60eb9798f5b",
                 {
                     center: [31.470299999999998, 37.58375],
                     crs: L.CRS.EPSG3857,
@@ -108,14 +106,34 @@
 
         
     
-            var tile_layer_0266b8a8783d6c9220fabe6f42134e3e = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            var tile_layer_e84570cb07d89b2a3003b2eb8d939715 = L.tileLayer(
+                "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
-  "maxZoom": 19,
-  "maxNativeZoom": 19,
+  "maxZoom": 20,
+  "maxNativeZoom": 20,
   "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "attribution": "CartoDB",
+  "subdomains": "abcd",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_e84570cb07d89b2a3003b2eb8d939715.addTo(map_9015db9b01a562352de2c60eb9798f5b);
+        
+    
+            var tile_layer_316d5ca70d5df8960b010b827b8246ad = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Esri",
   "subdomains": "abc",
   "detectRetina": false,
   "tms": false,
@@ -125,114 +143,99 @@
             );
         
     
-            tile_layer_0266b8a8783d6c9220fabe6f42134e3e.addTo(map_2579d12b9e8ea2a8083e39886e83cfac);
+            tile_layer_316d5ca70d5df8960b010b827b8246ad.addTo(map_9015db9b01a562352de2c60eb9798f5b);
         
     
-            var poly_line_f435668c5806e902b5efbf7fcb5ebb92 = L.polyline(
+            var tile_layer_a16994423dda2fec807555cc68381d0e = L.tileLayer(
+                "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Esri",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_a16994423dda2fec807555cc68381d0e.addTo(map_9015db9b01a562352de2c60eb9798f5b);
+        
+    
+            var poly_line_09369a2ca5758853cb8bba61762f73a1 = L.polyline(
                 [[26.8206, 30.8025], [36.12, 44.365]],
                 {"bubblingMouseEvents": true, "color": "gray", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "gray", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2}
-            ).addTo(map_2579d12b9e8ea2a8083e39886e83cfac);
+            ).addTo(map_9015db9b01a562352de2c60eb9798f5b);
         
     
-            var circle_marker_248072629901b3a3fef6170570964377 = L.circleMarker(
+            var circle_marker_7a1965129a86c86dff5988b835913b9e = L.circleMarker(
                 [26.8206, 30.8025],
                 {"bubblingMouseEvents": true, "color": "gold", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "gold", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
-            ).addTo(map_2579d12b9e8ea2a8083e39886e83cfac);
+            ).addTo(map_9015db9b01a562352de2c60eb9798f5b);
         
     
-        var popup_d0a7f839c26f22304d4c1839198f86f7 = L.popup({
+        var popup_098333e922cdb7607cfe200415ba9543 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_401f098bb90245df29f4704d756f3a1c = $(`<div id="html_401f098bb90245df29f4704d756f3a1c" style="width: 100.0%; height: 100.0%;"><strong>beer_ancient_egypt</strong><br>Type: beer<br>Group: Grain<br>Date: 3500 BCE<br>Description: Earliest known evidence of beer production in ancient Egypt.<br>Citation: </div>`)[0];
-                popup_d0a7f839c26f22304d4c1839198f86f7.setContent(html_401f098bb90245df29f4704d756f3a1c);
+                var html_e1c08d8f86c656150464d3932f021c66 = $(`<div id="html_e1c08d8f86c656150464d3932f021c66" style="width: 100.0%; height: 100.0%;"><strong>beer_ancient_egypt</strong><br>Type: beer<br>Group: Grain<br>Date: 3500 BCE<br>Description: Earliest known evidence of beer production in ancient Egypt.<br>Citation: </div>`)[0];
+                popup_098333e922cdb7607cfe200415ba9543.setContent(html_e1c08d8f86c656150464d3932f021c66);
             
         
 
-        circle_marker_248072629901b3a3fef6170570964377.bindPopup(popup_d0a7f839c26f22304d4c1839198f86f7)
+        circle_marker_7a1965129a86c86dff5988b835913b9e.bindPopup(popup_098333e922cdb7607cfe200415ba9543)
         ;
 
         
     
     
-            var circle_marker_cbd9381c60b39dcc1ce7981f11db130a = L.circleMarker(
+            var circle_marker_050db035a5b383574c28eaa86c698783 = L.circleMarker(
                 [36.12, 44.365],
                 {"bubblingMouseEvents": true, "color": "gold", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "gold", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
-            ).addTo(map_2579d12b9e8ea2a8083e39886e83cfac);
+            ).addTo(map_9015db9b01a562352de2c60eb9798f5b);
         
     
-        var popup_b99bafc419a11d5b09d772c31a166cb1 = L.popup({
+        var popup_5234a622599cd63b89848a5108370c73 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_de8037c0cd3b0980e26c18a71591fb64 = $(`<div id="html_de8037c0cd3b0980e26c18a71591fb64" style="width: 100.0%; height: 100.0%;"><strong>beer_mesopotamia</strong><br>Type: beer<br>Group: Grain<br>Date: 3400 BCE<br>Description: The earliest confirmed evidence of beer in Mesopotamia dates back to around 3400 BCE. This evidence includes organic residue found in ceramic vessels, particularly at the site of Godin Tepe in modern-day Iran.<br>Citation: </div>`)[0];
-                popup_b99bafc419a11d5b09d772c31a166cb1.setContent(html_de8037c0cd3b0980e26c18a71591fb64);
+                var html_7b1880d7053a5f3a04473a28d070f798 = $(`<div id="html_7b1880d7053a5f3a04473a28d070f798" style="width: 100.0%; height: 100.0%;"><strong>beer_mesopotamia</strong><br>Type: beer<br>Group: Grain<br>Date: 3400 BCE<br>Description: The earliest confirmed evidence of beer in Mesopotamia dates back to around 3400 BCE. This evidence includes organic residue found in ceramic vessels, particularly at the site of Godin Tepe in modern-day Iran.<br>Citation: </div>`)[0];
+                popup_5234a622599cd63b89848a5108370c73.setContent(html_7b1880d7053a5f3a04473a28d070f798);
             
         
 
-        circle_marker_cbd9381c60b39dcc1ce7981f11db130a.bindPopup(popup_b99bafc419a11d5b09d772c31a166cb1)
+        circle_marker_050db035a5b383574c28eaa86c698783.bindPopup(popup_5234a622599cd63b89848a5108370c73)
         ;
 
         
     
     
-
-        function geo_json_40f4710a76c617adadc45c9052a28153_onEachFeature(feature, layer) {
-
-            layer.on({
-            });
-        };
-        var geo_json_40f4710a76c617adadc45c9052a28153 = L.geoJson(null, {
-                onEachFeature: geo_json_40f4710a76c617adadc45c9052a28153_onEachFeature,
-            
-            ...{
+            var layer_control_813e424a40568efe4733cf276708eb6c_layers = {
+                base_layers : {
+                    "Street (English)" : tile_layer_e84570cb07d89b2a3003b2eb8d939715,
+                    "Satellite" : tile_layer_316d5ca70d5df8960b010b827b8246ad,
+                },
+                overlays :  {
+                    "Hybrid (Satellite + Labels)" : tile_layer_a16994423dda2fec807555cc68381d0e,
+                },
+            };
+            let layer_control_813e424a40568efe4733cf276708eb6c = L.control.layers(
+                layer_control_813e424a40568efe4733cf276708eb6c_layers.base_layers,
+                layer_control_813e424a40568efe4733cf276708eb6c_layers.overlays,
+                {
+  "position": "bottomleft",
+  "collapsed": false,
+  "autoZIndex": true,
 }
-        });
-
-        function geo_json_40f4710a76c617adadc45c9052a28153_add (data) {
-            geo_json_40f4710a76c617adadc45c9052a28153
-                .addData(data);
-        }
-            geo_json_40f4710a76c617adadc45c9052a28153_add({"features": [{"geometry": {"coordinates": [30.8025, 26.8206], "type": "Point"}, "properties": {"node_id": "beer_ancient_egypt"}, "type": "Feature"}, {"geometry": {"coordinates": [44.365, 36.12], "type": "Point"}, "properties": {"node_id": "beer_mesopotamia"}, "type": "Feature"}], "type": "FeatureCollection"});
-        geo_json_40f4710a76c617adadc45c9052a28153.setStyle(function(feature) {return feature.properties.style;});
-
-        
-    
-            geo_json_40f4710a76c617adadc45c9052a28153.addTo(map_2579d12b9e8ea2a8083e39886e83cfac);
-        
-    
-            var geo_json_40f4710a76c617adadc45c9052a28153searchControl = new L.Control.Search({
-                layer: geo_json_40f4710a76c617adadc45c9052a28153,
-                
-                propertyName: 'node_id',
-                
-                collapsed: false,
-                textPlaceholder: 'Search Node ID...',
-                position:'topleft',
-            
-                initial: false,
-                
-                hideMarkerOnCollapse: true
-            
-                });
-                geo_json_40f4710a76c617adadc45c9052a28153searchControl.on('search:locationfound', function(e) {
-                    geo_json_40f4710a76c617adadc45c9052a28153.setStyle(function(feature){
-                        return feature.properties.style
-                    })
-                    
-                    if(e.layer._popup)
-                        e.layer.openPopup();
-                })
-                geo_json_40f4710a76c617adadc45c9052a28153searchControl.on('search:collapsed', function(e) {
-                        geo_json_40f4710a76c617adadc45c9052a28153.setStyle(function(feature){
-                            return feature.properties.style
-                    });
-                });
-            map_2579d12b9e8ea2a8083e39886e83cfac.addControl( geo_json_40f4710a76c617adadc45c9052a28153searchControl );
+            ).addTo(map_9015db9b01a562352de2c60eb9798f5b);
 
         
 </script>

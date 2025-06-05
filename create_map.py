@@ -15,28 +15,23 @@ def parse_year(date_str: str) -> int:
     If parsing fails, return 0 (so radius fallback works).
     """
     date_str = date_str.strip()
-    # Match '#### BCE' or '#### CE'
     m = re.match(r"(\d+)\s*(BCE|CE)$", date_str)
     if m:
         year = int(m.group(1))
         era = m.group(2)
         return -year if era == "BCE" else year
 
-    # Match '(\d+)(st|nd|rd|th) century (BCE|CE)'
     m2 = re.match(r"(\d+)(?:st|nd|rd|th)\s+century\s*(BCE|CE)$", date_str)
     if m2:
         century = int(m2.group(1))
         era = m2.group(2)
-        # approximate midpoint of that century: (century * 100 - 50)
         mid = (century * 100) - 50
         return -mid if era == "BCE" else mid
 
-    # Match just a year without era (assume CE)
     m3 = re.match(r"(\d{3,4})$", date_str)
     if m3:
         return int(m3.group(1))
 
-    # If nothing matches, return 0
     return 0
 
 def compute_radius(year: int) -> int:
@@ -46,12 +41,8 @@ def compute_radius(year: int) -> int:
     We'll clamp between 4 and 12.
     """
     if year == 0:
-        return 5  # default radius if unknown
+        return 5
 
-    # Map year range roughly from -5000 → 2000 into radius range 12 → 4
-    # r = m * year + b, where:
-    #   For year = -5000 → radius ~12
-    #   For year = 2000  → radius ~4
     m = (4 - 12) / (2000 - (-5000))  # slope
     b = 12 - (m * -5000)
     r = m * year + b
@@ -100,7 +91,6 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
     df = df.dropna(subset=["latitude", "longitude"]).reset_index(drop=True)
 
-    # Compute 'year' and 'radius'
     df["year"] = df["date"].apply(parse_year)
     df["radius"] = df["year"].apply(compute_radius)
 
@@ -134,20 +124,20 @@ def add_parent_child_lines(m: folium.Map, df: pd.DataFrame) -> None:
 
 def add_legend(m: folium.Map, group_color_map: dict) -> None:
     """
-    Injects a simple HTML legend in the top-right corner with rounded corners
+    Injects a simple HTML legend in the bottom-right corner with rounded corners
     and slight transparency.
     """
     legend_html = """
      <div style="
        position: fixed;
-       top: 10px; right: 10px;
+       bottom: 10px; right: 10px;
        width: 160px;
        background-color: rgba(255, 255, 255, 0.8);
-       border:2px solid gray;
+       border: 2px solid gray;
        border-radius: 8px;
-       z-index:9999;
-       font-size:14px;
-       line-height:18px;
+       z-index: 9999;
+       font-size: 14px;
+       line-height: 18px;
        padding: 8px;
        box-shadow: 3px 3px 6px rgba(0,0,0,0.2);
      ">
@@ -159,6 +149,7 @@ def add_legend(m: folium.Map, group_color_map: dict) -> None:
          {group}<br>
         """
     legend_html += "</div>"
+
     m.get_root().html.add_child(folium.Element(legend_html))
 
 def create_folium_map(df: pd.DataFrame) -> folium.Map:
@@ -169,7 +160,6 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
       • Color-coded CircleMarkers by group,
       • Variable radius based on 'date',
       • Parent→child lines,
-      • A searchable GeoJSON layer for node_id,
       • An enhanced legend.
     """
     group_color_map = {
@@ -185,14 +175,15 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
     # 1) Initialize empty map (no default tiles)
     m = folium.Map(location=[center_lat, center_lon], zoom_start=2, tiles=None)
 
-    # 2) Add an English-labeled “Street” layer (CartoDB Positron)
+    # 2) Add an English-labeled “Street” layer (CartoDB Positron) with attribution
     folium.TileLayer(
-        'CartoDB positron',
+        tiles='CartoDB positron',
+        attr='CartoDB',
         name='Street (English)',
         control=True
     ).add_to(m)
 
-    # 3) Add pure Satellite imagery (ESRI)
+    # 3) Add pure Satellite imagery (ESRI) with proper attribution
     folium.TileLayer(
         tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         attr='Esri',
@@ -200,7 +191,7 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         control=True
     ).add_to(m)
 
-    # 4) Add a “labels only” overlay to create Hybrid
+    # 4) Add a “labels only” overlay to create Hybrid (with proper attr)
     folium.TileLayer(
         tiles='https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
         attr='Esri',
@@ -209,24 +200,10 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         control=True
     ).add_to(m)
 
-    # 5) Optional additional styles:
-    #    • Dark Mode
-    folium.TileLayer(
-        'CartoDB dark_matter',
-        name='Dark Mode',
-        control=True
-    ).add_to(m)
-    #    • Terrain
-    folium.TileLayer(
-        'Stamen Terrain',
-        name='Terrain',
-        control=True
-    ).add_to(m)
-
-    # 6) Draw parent→child lines first (so markers sit on top)
+    # 5) Draw parent→child lines first (so markers sit on top)
     add_parent_child_lines(m, df)
 
-    # 7) Add individual CircleMarkers (with radius)
+    # 6) Add individual CircleMarkers (with radius); remove any “pins”
     for _, row in df.iterrows():
         color = group_color_map.get(row["group"], "blue")
         folium.CircleMarker(
@@ -247,45 +224,11 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
             )
         ).add_to(m)
 
-    # 8) Build a minimal GeoJSON for Search (only node_id + coordinates)
-    features = []
-    for _, row in df.iterrows():
-        props = {"node_id": row["node_id"]}
-        feature = {
-            "type": "Feature",
-            "properties": props,
-            "geometry": {
-                "type": "Point",
-                "coordinates": [float(row["longitude"]), float(row["latitude"])]
-            }
-        }
-        features.append(feature)
-
-    geojson_data = {
-        "type": "FeatureCollection",
-        "features": features
-    }
-
-    # 9) Add the GeoJSON layer
-    geojson_layer = folium.GeoJson(
-        data=geojson_data,
-        name="All Nodes"
-    )
-    geojson_layer.add_to(m)
-
-    # 10) Add the Search plugin, referencing that geojson_layer
-    Search(
-        layer=geojson_layer,
-        search_label='node_id',
-        placeholder='Search Node ID...',
-        collapsed=False
-    ).add_to(m)
-
-    # 11) Inject the enhanced legend
+    # 7) Inject the enhanced legend (bottom-right)
     add_legend(m, group_color_map)
 
-    # 12) Finally, add the LayerControl so users can switch among tiles
-    folium.LayerControl(collapsed=False).add_to(m)
+    # 8) Finally, add the LayerControl so users can switch among tiles
+    folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
 
     return m
 
@@ -299,7 +242,7 @@ def main():
     print(f"✅ DataFrame ready: {len(df)} valid points.")
 
     fmap = create_folium_map(df)
-    print("✅ Map with tile layers, variable radii, search box, lines, and legend created.")
+    print("✅ Map with tile layers, variable radii, lines, and legend created.")
 
     output_file = "docs/index.html"
     fmap.save(output_file)
