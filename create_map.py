@@ -164,11 +164,13 @@ def add_legend(m: folium.Map, group_color_map: dict) -> None:
 def create_folium_map(df: pd.DataFrame) -> folium.Map:
     """
     Creates a Folium map with:
-      • Color-coded CircleMarkers by group
-      • Variable radius based on 'date'
-      • Parent→child lines
-      • A searchable GeoJSON layer for node_id
-      • An enhanced legend
+      • English-labeled Street base,
+      • Satellite & Hybrid options,
+      • Color-coded CircleMarkers by group,
+      • Variable radius based on 'date',
+      • Parent→child lines,
+      • A searchable GeoJSON layer for node_id,
+      • An enhanced legend.
     """
     group_color_map = {
         "Grain": "gold",
@@ -179,12 +181,52 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
 
     center_lat = df["latitude"].mean()
     center_lon = df["longitude"].mean()
-    m = folium.Map(location=[center_lat, center_lon], zoom_start=2)
 
-    # Draw lines first
+    # 1) Initialize empty map (no default tiles)
+    m = folium.Map(location=[center_lat, center_lon], zoom_start=2, tiles=None)
+
+    # 2) Add an English-labeled “Street” layer (CartoDB Positron)
+    folium.TileLayer(
+        'CartoDB positron',
+        name='Street (English)',
+        control=True
+    ).add_to(m)
+
+    # 3) Add pure Satellite imagery (ESRI)
+    folium.TileLayer(
+        tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        attr='Esri',
+        name='Satellite',
+        control=True
+    ).add_to(m)
+
+    # 4) Add a “labels only” overlay to create Hybrid
+    folium.TileLayer(
+        tiles='https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+        attr='Esri',
+        name='Hybrid (Satellite + Labels)',
+        overlay=True,
+        control=True
+    ).add_to(m)
+
+    # 5) Optional additional styles:
+    #    • Dark Mode
+    folium.TileLayer(
+        'CartoDB dark_matter',
+        name='Dark Mode',
+        control=True
+    ).add_to(m)
+    #    • Terrain
+    folium.TileLayer(
+        'Stamen Terrain',
+        name='Terrain',
+        control=True
+    ).add_to(m)
+
+    # 6) Draw parent→child lines first (so markers sit on top)
     add_parent_child_lines(m, df)
 
-    # Add individual CircleMarkers (with radius)
+    # 7) Add individual CircleMarkers (with radius)
     for _, row in df.iterrows():
         color = group_color_map.get(row["group"], "blue")
         folium.CircleMarker(
@@ -205,7 +247,7 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
             )
         ).add_to(m)
 
-    # Build a minimal GeoJSON for Search (only node_id + coordinates)
+    # 8) Build a minimal GeoJSON for Search (only node_id + coordinates)
     features = []
     for _, row in df.iterrows():
         props = {"node_id": row["node_id"]}
@@ -224,14 +266,14 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         "features": features
     }
 
-    # Add the GeoJSON layer
+    # 9) Add the GeoJSON layer
     geojson_layer = folium.GeoJson(
         data=geojson_data,
         name="All Nodes"
     )
     geojson_layer.add_to(m)
 
-    # Add the Search plugin, referencing that geojson_layer
+    # 10) Add the Search plugin, referencing that geojson_layer
     Search(
         layer=geojson_layer,
         search_label='node_id',
@@ -239,8 +281,11 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         collapsed=False
     ).add_to(m)
 
-    # Inject the enhanced legend
+    # 11) Inject the enhanced legend
     add_legend(m, group_color_map)
+
+    # 12) Finally, add the LayerControl so users can switch among tiles
+    folium.LayerControl(collapsed=False).add_to(m)
 
     return m
 
@@ -254,7 +299,7 @@ def main():
     print(f"✅ DataFrame ready: {len(df)} valid points.")
 
     fmap = create_folium_map(df)
-    print("✅ Map with variable radii, search box, lines, and legend created.")
+    print("✅ Map with tile layers, variable radii, search box, lines, and legend created.")
 
     output_file = "docs/index.html"
     fmap.save(output_file)
