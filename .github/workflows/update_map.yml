@@ -4,18 +4,19 @@ on:
   push:
     branches:
       - main
-  # Run once every hour, on the hour (UTC)
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0 * * * *'  # every hour, on the hour (UTC)
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repo
+      # 1) Check out the repo (with default GITHUB_TOKEN credentials)
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true  # ensures GITHUB_TOKEN is used for any git push
 
       # 2) Reconstruct service-account JSON from secret
       - name: Write GCP Service Account JSON
@@ -36,16 +37,25 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas folium gspread google-auth
 
-      # 5) Run our mapping script
+      # 5) Run the mapping script
       - name: Generate updated map
         run: |
           python create_map.py
 
-      # 6) Commit and push new docs/index.html (if changes detected)
+      # 6) Commit and push new docs/index.html if changed
       - name: Commit and push changes
         run: |
+          # Configure commit author
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage the updated file
           git add docs/index.html
-          git diff --quiet && echo "No changes to index.html; skipping commit." || git commit -m "chore: auto-update map at $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
-          git push origin main
+
+          # If there are changes, commit and push
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: auto-update map at $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+            git push origin main
+          else
+            echo "No changes to index.html; skipping commit and push."
+          fi
