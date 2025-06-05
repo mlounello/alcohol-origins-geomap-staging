@@ -1,25 +1,29 @@
 name: Update Alcohol Origins GeoMap
 
+# Explicitly request write access so GITHUB_TOKEN can push
+permissions:
+  contents: write
+
 on:
   push:
     branches:
       - main
   schedule:
-    - cron: '0 * * * *'  # every hour, on the hour (UTC)
+    - cron: '0 * * * *'  # every hour on the hour (UTC)
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the repo, with token so checkout config is ready
+      # 1) Check out the repo, explicitly using the GITHUB_TOKEN for writes
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
 
-      # 2) Reconstruct service-account JSON from secret
+      # 2) Reconstruct service-account JSON from a secret
       - name: Write GCP Service Account JSON
         env:
           SA_JSON: ${{ secrets.GCP_SERVICE_ACCOUNT }}
@@ -55,14 +59,9 @@ jobs:
           # Stage the updated file
           git add docs/index.html
 
-          # Only commit if there are staged changes
+          # Only commit & push if there are staged changes
           if ! git diff --cached --quiet; then
             git commit -m "chore: auto-update map at $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
-
-            # Reset origin to use the GITHUB_TOKEN for authentication
-            git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/mlounello/alcohol-origins-geomap.git
-
-            # Push changes to main
             git push origin main
           else
             echo "No changes to index.html; skipping commit and push."
