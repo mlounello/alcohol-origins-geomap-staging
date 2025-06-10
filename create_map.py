@@ -237,7 +237,7 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
 
 def main():
     SHEET_ID = "1obKjWhdnJhK3f6qImN0DrQJEBZP-YigvjrU128QkjMM"
-    WORKSHEET = "Sheet1"
+    WORKSHEET = "Data"
 
     df = load_sheet_to_df(SHEET_ID, WORKSHEET)
     print("✅ Loaded sheet. Preparing DataFrame…")
