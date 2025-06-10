@@ -163,10 +163,13 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
       • An enhanced legend.
     """
     group_color_map = {
-        "Grain": "gold",
-        "Grape": "purple",
-        "Sugar": "saddlebrown",
-        "Cactus": "green"
+        "Grain":   "#f9d81b",
+        "Grape":   "#75147c",
+        "Sugar":   "#FFFFFF",     
+        "Cactus":  "#367c21",
+        "Spice":   "#8B4513",     
+        "Floral":  "#FFC0CB",     
+        "Roots":   "#B22222"      
     }
 
     center_lat = df["latitude"].mean()
