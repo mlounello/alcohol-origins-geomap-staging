@@ -136,9 +136,9 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         "Grape":  "#75147c",
         "Sugar":  "#FFFFFF",
         "Cactus": "#367c21",
-        "Spice":  "#8B4513",
-        "Floral": "#FFC0CB",
-        "Roots":  "#B22222",
+        #"Spice":  "#8B4513",
+        #"Floral": "#FFC0CB",
+        #"Roots":  "#B22222",
     }
 
     # 2) Center map
