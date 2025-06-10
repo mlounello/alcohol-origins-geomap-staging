@@ -96,28 +96,28 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     return df
 
-def add_parent_child_lines(m: folium.Map, df: pd.DataFrame) -> None:
+def add_parent_child_lines(m: folium.Map, df: pd.DataFrame, group_color_map: dict) -> None:
     """
-    Draws a polyline between each child node and its parent node, if parent_id exists.
+    Draws a polyline between each child node and its parent node,
+    coloring the line to match the child's group color.
     """
-    coords_lookup = {
+    # Build lookup of node_id → (lat, lon)
+    coords = {
         row["node_id"]: (row["latitude"], row["longitude"])
         for _, row in df.iterrows()
-        if pd.notna(row["node_id"]) and row["node_id"] != ""
+        if row["node_id"]
     }
 
     for _, row in df.iterrows():
-        parent_id = row["parent_id"]
-        child_id = row["node_id"]
-        if pd.notna(parent_id) and parent_id != "":
-            if parent_id not in coords_lookup:
-                print(f"Warning: parent_id '{parent_id}' not found for child '{child_id}'.")
-                continue
-            parent_coords = coords_lookup[parent_id]
-            child_coords = (row["latitude"], row["longitude"])
+        pid = row["parent_id"]
+        if pid and pid in coords:
+            parent_loc = coords[pid]
+            child_loc  = (row["latitude"], row["longitude"])
+            # Use the child's group color, defaulting to gray
+            color = group_color_map.get(row["group"], "gray")
             folium.PolyLine(
-                locations=[parent_coords, child_coords],
-                color="gray",
+                locations=[parent_loc, child_loc],
+                color=color,
                 weight=2,
                 opacity=0.6
             ).add_to(m)
@@ -204,7 +204,7 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
     ).add_to(m)
 
     # 5) Draw parent→child lines first (so markers sit on top)
-    add_parent_child_lines(m, df)
+    add_parent_child_lines(m, df, group_color_map)
 
     # 6) Add individual CircleMarkers (with radius); remove any “pins”
     for _, row in df.iterrows():
