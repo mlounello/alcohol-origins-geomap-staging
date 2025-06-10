@@ -48,7 +48,7 @@ def compute_radius(year: int) -> int:
     r = m * year + b
     return int(max(4, min(12, r)))
 
-def load_sheet_to_df(sheet_id: str, worksheet_name: str = "Sheet1") -> pd.DataFrame:
+def load_sheet_to_df(sheet_id: str, worksheet_name: str = "Data") -> pd.DataFrame:
     """
     Authenticate using service_account.json, open the Google Sheet by ID,
     read the specified worksheet into a pandas DataFrame, and return it.
