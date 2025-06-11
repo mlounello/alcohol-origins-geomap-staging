@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Restore GCP service account key
         run: |
@@ -42,6 +44,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
+          github_token: ${{ secrets.PAGES_PAT }}   # use your PAT, not GITHUB_TOKEN
           publish_dir: ./docs
           publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
