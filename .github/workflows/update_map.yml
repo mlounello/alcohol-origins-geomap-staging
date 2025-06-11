@@ -2,14 +2,15 @@ name: Update Alcohol Origins GeoMap
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
   schedule:
     - cron: '0 * * * *'
 
 permissions:
-  contents: read      # we only need to read the repo
-  pages: write        # allow publishing to GitHub Pages
+  contents: read
+  pages: write
 
 jobs:
   build-and-deploy:
@@ -21,7 +22,9 @@ jobs:
 
       - name: Restore GCP service account key
         run: |
-          echo "${{ secrets.GCP_SERVICE_ACCOUNT }}" > ./alcohol-origins-geomap-cd20d437877f.json
+          cat << 'EOF' > ./alcohol-origins-geomap-cd20d437877f.json
+          ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          EOF
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
