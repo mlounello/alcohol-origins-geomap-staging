@@ -1,7 +1,9 @@
 # create_map.py
 
+import os
 import pandas as pd
 import folium
+from folium.plugins import Search
 import gspread
 from google.oauth2.service_account import Credentials
 import sys
@@ -235,9 +237,15 @@ def main():
     print(f"✅ Loaded {len(df)} rows.")
     df = prepare_dataframe(df)
     print(f"✅ Prepared {len(df)} valid points.")
+
     fmap = create_folium_map(df)
-    fmap.save("docs/index.html")
-    print("✅ Map saved to docs/index.html.")
+
+    # Ensure the docs/ directory exists before saving
+    output_file = "docs/index.html"
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+
+    fmap.save(output_file)
+    print(f"✅ Map saved to {output_file}.")
 
 if __name__ == "__main__":
     main()
