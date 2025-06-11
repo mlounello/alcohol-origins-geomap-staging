@@ -207,7 +207,7 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
             folium.PolyLine(
                 locations=[coords[pid], (row["latitude"], row["longitude"])],
                 color=group_color_map[grp],
-                weight=5, opacity=0
+                weight=5, opacity=100
             ).add_to(fg)
         folium.CircleMarker(
             location=[row["latitude"], row["longitude"]],
