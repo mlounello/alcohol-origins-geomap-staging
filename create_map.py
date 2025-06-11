@@ -91,7 +91,7 @@ def add_parent_child_lines(m: folium.Map, df: pd.DataFrame, color_map: dict) -> 
             folium.PolyLine(
                 locations=[coords[pid], (row["latitude"], row["longitude"])],
                 color=color_map.get(row["group"], "gray"),
-                weight=2, opacity=0.6
+                weight=5, opacity=0.6
             ).add_to(m)
 
 def add_legend(m: folium.Map, color_map: dict) -> None:
@@ -207,7 +207,7 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
             folium.PolyLine(
                 locations=[coords[pid], (row["latitude"], row["longitude"])],
                 color=group_color_map[grp],
-                weight=5, opacity=100
+                weight=2, opacity=0.6
             ).add_to(fg)
         folium.CircleMarker(
             location=[row["latitude"], row["longitude"]],
