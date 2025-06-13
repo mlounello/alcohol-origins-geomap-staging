@@ -68,7 +68,7 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 def create_folium_map(df: pd.DataFrame) -> folium.Map:
-    # 1) Colors
+    # 1) Define your groups and colors
     group_color_map = {
         "Grain":  "#f9d81b",
         "Grape":  "#75147c",
@@ -76,44 +76,58 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         "Cactus": "#367c21",
     }
 
-    # 2) Base map
-    center = [df["latitude"].mean(), df["longitude"].mean()]
-    m = folium.Map(location=center, zoom_start=2, tiles=None)
+    # 2) Initialize empty map (no default tiles)
+    m = folium.Map(
+        location=[df["latitude"].mean(), df["longitude"].mean()],
+        zoom_start=2,
+        tiles=None
+    )
+
+    # 2a) Grab the real Folium map variable name for use in JS
+    map_var = m.get_name()
 
     # 3) Base layers
-    folium.TileLayer("CartoDB positron", attr="CartoDB",
-                     name="Street (English)", overlay=False, control=True).add_to(m)
+    folium.TileLayer(
+        "CartoDB positron", attr="CartoDB",
+        name="Street (English)", overlay=False, control=True
+    ).add_to(m)
+
     folium.TileLayer(
         tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         attr="Esri", name="Satellite", overlay=False, control=True
     ).add_to(m)
+
     hybrid_fg = folium.FeatureGroup(
         name="Hybrid (Satellite + Labels)", overlay=False, control=True
     ).add_to(m)
+
+    # imagery
     folium.TileLayer(
         tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         attr="Esri", overlay=False, control=False
     ).add_to(hybrid_fg)
+    # labels
     folium.TileLayer(
         tiles="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
         attr="Esri", overlay=False, control=False
     ).add_to(hybrid_fg)
 
-    # 4) One FeatureGroup per beverage group
+    # 4) Overlays per beverage group
     group_fgs = {}
     for grp, color in group_color_map.items():
         name_html = (
-            f'<span style="background:{color};width:12px;height:12px;'
-            'display:inline-block;margin-right:6px;border:1px solid #000;"></span>'
+            f'<span style="background:{color};'
+            'width:12px;height:12px;display:inline-block;'
+            'margin-right:6px;border:1px solid #000;"></span>'
             f'{grp}'
         )
         fg = folium.FeatureGroup(name=name_html, show=True).add_to(m)
         group_fgs[grp] = fg
 
-    # 5) Draw lines & circles in each FG
+    # 5) Draw lines & circles
     coords = {
-        r["node_id"]:(r["latitude"],r["longitude"])
-        for _,r in df.iterrows() if r["node_id"]
+        r["node_id"]: (r["latitude"], r["longitude"])
+        for _, r in df.iterrows() if r["node_id"]
     }
     for _, row in df.iterrows():
         grp = row["group"]
@@ -142,52 +156,61 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
     # 6) LayerControl
     folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
 
-    # 7) Filter sidebar HTML (top-left)
+    # 7) Build filter sidebar with color swatches, bottom-right
     checkbox_html = "\n".join(
-        f'<input type="checkbox" class="filter-group" value="{grp}" checked> {grp}<br>'
+        f'<label style="display:block;cursor:pointer;">'
+        f'<input type="checkbox" class="filter-group" value="{grp}" checked>'
+        f'<span style="background:{group_color_map[grp]};'
+        'display:inline-block;width:12px;height:12px;'
+        'margin:0 6px 0 4px;border:1px solid #000;"></span>'
+        f'{grp}</label>'
         for grp in group_color_map
     )
+
     sidebar_html = f"""
     <div id="filter-sidebar" style="
-      position: fixed; top: 50px; left: 10px;
+      position: fixed; bottom: 50px; right: 10px; top: auto; left: auto;
       background: white; padding: 10px;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
       z-index: 9999; width: 180px;
     ">
       <h4>Filters</h4>
-      <b>Group</b><br>
+      <b>Groups</b><br>
       {checkbox_html}
       <hr>
       <b>Year Range</b><br>
-      <input id="year-min" type="number" value="-5000" style="width:70px;"> to
+      <input id="year-min" type="number" value="-5000" style="width:70px;">
+      to
       <input id="year-max" type="number" value="2000" style="width:70px;"><br>
       <button id="apply-filters">Apply Filters</button>
     </div>
     """
     m.get_root().html.add_child(folium.Element(sidebar_html))
 
-    # 8) New filter script: scan all overlayPane layers by name
-    filter_script = """
+    # 8) JavaScript uses the real map var and toggles overlayPane layers
+    filter_script = f"""
     <script>
-      function applyFilters() {
-        // which groups are checked?
+      var _map = {map_var};
+
+      function applyFilters() {{
         var checked = Array.from(
           document.querySelectorAll('.filter-group:checked')
-        ).map(c=>c.value);
+        ).map(c => c.value);
 
-        map.eachLayer(function(layer){
-          // only consider overlayPane feature groups
-          if (layer.options && layer.options.pane === 'overlayPane' && layer.options.name) {
-            // strip any HTML tags from the name
+        _map.eachLayer(function(layer) {{
+          if (layer.options
+              && layer.options.pane === 'overlayPane'
+              && layer.options.name) {{
             var raw = layer.options.name.replace(/<[^>]*>/g,'');
-            if (checked.includes(raw)) {
-              if (!map.hasLayer(layer)) map.addLayer(layer);
-            } else {
-              if (map.hasLayer(layer)) map.removeLayer(layer);
-            }
-          }
-        });
-      }
+            if (checked.includes(raw)) {{
+              if (!_map.hasLayer(layer)) _map.addLayer(layer);
+            }} else {{
+              if (_map.hasLayer(layer)) _map.removeLayer(layer);
+            }}
+          }}
+        }});
+      }}
+
       document.getElementById('apply-filters').onclick = applyFilters;
     </script>
     """
@@ -196,8 +219,8 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
     return m
 
 def main():
-    SHEET_ID   = "1obKjWhdnJhK3f6qImN0DrQJEBZP-YigvjrU128QkjMM"
-    WORKSHEET  = "Data"
+    SHEET_ID  = "1obKjWhdnJhK3f6qImN0DrQJEBZP-YigvjrU128QkjMM"
+    WORKSHEET = "Data"
 
     df = load_sheet_to_df(SHEET_ID, WORKSHEET)
     print(f"✅ Loaded {len(df)} rows.")
