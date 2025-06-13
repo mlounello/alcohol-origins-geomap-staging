@@ -74,10 +74,10 @@ def prepare_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
     Clean lat/lon and compute 'year' and 'radius'.
     """
-    df["latitude"] = pd.to_numeric(df["latitude"], errors="coerce")
+    df["latitude"]  = pd.to_numeric(df["latitude"], errors="coerce")
     df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
     df = df.dropna(subset=["latitude", "longitude"]).reset_index(drop=True)
-    df["year"] = df["date"].apply(parse_year)
+    df["year"]   = df["date"].apply(parse_year)
     df["radius"] = df["year"].apply(compute_radius)
     return df
 
@@ -85,8 +85,10 @@ def add_parent_child_lines(m: folium.Map, df: pd.DataFrame, color_map: dict) -> 
     """
     Draw lines colored by child group.
     """
-    coords = {row["node_id"]:(row["latitude"],row["longitude"])
-              for _, row in df.iterrows() if row["node_id"]}
+    coords = {
+        row["node_id"]:(row["latitude"], row["longitude"])
+        for _, row in df.iterrows() if row["node_id"]
+    }
     for _, row in df.iterrows():
         pid = row["parent_id"]
         if pid in coords:
@@ -117,7 +119,8 @@ def add_legend(m: folium.Map, color_map: dict) -> None:
     for grp, col in color_map.items():
         html += f"""
         <div id="legend-{grp}">
-          <i style="background:{col};width:12px;height:12px;display:inline-block;margin-right:6px;"></i>
+          <i style="background:{col};width:12px;height:12px;display:inline-block;
+                    margin-right:6px;border:1px solid #000;"></i>
           {grp}
         </div>
         """
@@ -131,62 +134,49 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
       • One overlay per beverage group with color swatches in the LayerControl
       • Parent→child lines & circles colored by group
       • LayerControl in bottom-left
+      • Dynamic filter sidebar in top-left
     """
-    # 1) Define colors
+    # --- 1) Define group colors ---
     group_color_map = {
         "Grain":  "#f9d81b",
         "Grape":  "#75147c",
         "Sugar":  "#FFFFFF",
         "Cactus": "#367c21",
-        #"Spice":  "#8B4513",
-        #"Floral": "#FFC0CB",
-        #"Roots":  "#B22222",
     }
 
-    # 2) Center map
+    # --- 2) Center map ---
     center = [df["latitude"].mean(), df["longitude"].mean()]
     m = folium.Map(location=center, zoom_start=2, tiles=None)
 
-    # 3) Base layer: Street
+    # --- 3) Base layers ---
     folium.TileLayer(
-        'CartoDB positron',
-        attr='CartoDB',
-        name='Street (English)',
-        overlay=False,
-        control=True
+        "CartoDB positron", attr="CartoDB",
+        name="Street (English)", overlay=False, control=True
+    ).add_to(m)
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri", name="Satellite",
+        overlay=False, control=True
     ).add_to(m)
 
-    # 4) Base layer: Satellite
-    folium.TileLayer(
-        tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        attr='Esri',
-        name='Satellite',
-        overlay=False,
-        control=True
-    ).add_to(m)
-
-    # 5) Base layer: Hybrid (imagery + labels) via a FeatureGroup
-    hybrid_fg = folium.FeatureGroup(name='Hybrid (Satellite + Labels)', overlay=False, control=True)
+    # Hybrid as a FeatureGroup (so radio behaves properly)
+    hybrid_fg = folium.FeatureGroup(
+        name="Hybrid (Satellite + Labels)",
+        overlay=False, control=True
+    )
     hybrid_fg.add_to(m)
-    # Imagery
     folium.TileLayer(
-        tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        attr='Esri',
-        overlay=False,
-        control=False
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri", overlay=False, control=False
     ).add_to(hybrid_fg)
-    # Labels overlay
     folium.TileLayer(
-        tiles='https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-        attr='Esri',
-        overlay=False,
-        control=False
+        tiles="https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri", overlay=False, control=False
     ).add_to(hybrid_fg)
 
-    # 6) Overlays: one FeatureGroup per beverage group
+    # --- 4) Create one FeatureGroup per beverage group ---
     group_fgs = {}
     for grp, color in group_color_map.items():
-        # Embed color swatch HTML in the name
         name_html = (
             f'<span style="background:{color};'
             'width:12px;height:12px;display:inline-block;'
@@ -197,11 +187,14 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
         fg.add_to(m)
         group_fgs[grp] = fg
 
-    # 7) Draw lines & circles into each group
-    coords = {r["node_id"]:(r["latitude"],r["longitude"]) for _,r in df.iterrows() if r["node_id"]}
+    # --- 5) Draw parent→child lines & circles into each group FG ---
+    coords = {
+        r["node_id"]:(r["latitude"],r["longitude"])
+        for _,r in df.iterrows() if r["node_id"]
+    }
     for _, row in df.iterrows():
         grp = row["group"]
-        fg = group_fgs.get(grp)
+        fg  = group_fgs.get(grp)
         if not fg:
             continue
         pid = row["parent_id"]
@@ -209,13 +202,14 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
             folium.PolyLine(
                 locations=[coords[pid], (row["latitude"], row["longitude"])],
                 color=group_color_map[grp],
-                weight=3, opacity=25
+                weight=2, opacity=0.6
             ).add_to(fg)
         folium.CircleMarker(
             location=[row["latitude"], row["longitude"]],
             radius=row["radius"],
             color=group_color_map[grp],
-            fill=True, fill_color=group_color_map[grp], fill_opacity=0.7,
+            fill=True, fill_color=group_color_map[grp],
+            fill_opacity=0.7,
             popup=folium.Popup(
                 f"<strong>{row['node_id']}</strong><br>"
                 f"{row['type']} / {row['group']} / {row['date']}<br>"
@@ -224,14 +218,83 @@ def create_folium_map(df: pd.DataFrame) -> folium.Map:
             )
         ).add_to(fg)
 
-    # 8) Add LayerControl for all layers (base radios + group checkboxes)
+    # --- 6) LayerControl for base + overlays ---
     folium.LayerControl(position='bottomleft', collapsed=False).add_to(m)
+
+    # --- 7) Inject Dynamic Filter Sidebar in top-left ---
+    # Build the HTML checkboxes for each group
+    checkbox_html = "\n".join(
+        f'<input type="checkbox" class="filter-group" value="{grp}" checked> {grp}<br>'
+        for grp in group_color_map
+    )
+    sidebar_html = f"""
+    <div id="filter-sidebar" style="
+      position: fixed; top: 50px; left: 10px;
+      background: white; padding: 10px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+      z-index: 9999; width: 180px;
+    ">
+      <h4>Filters</h4>
+      <b>Group</b><br>
+      {checkbox_html}
+      <hr>
+      <b>Year Range</b><br>
+      <input id="year-min" type="number" value="-5000" style="width:70px;"> to
+      <input id="year-max" type="number" value="2000" style="width:70px;"><br>
+      <button id="apply-filters">Apply Filters</button>
+    </div>
+    """
+    m.get_root().html.add_child(folium.Element(sidebar_html))
+
+    # Capture each FG’s JS variable name
+    layer_var_map = {
+        grp: fg.get_name()
+        for grp, fg in group_fgs.items()
+    }
+
+    # --- 8) Inject filter logic JavaScript ---
+    # Build a JS object literal mapping group→layerVar
+    map_entries = ",\n  ".join(
+        f"'{grp}': {var}"
+        for grp, var in layer_var_map.items()
+    )
+    filter_script = f"""
+    <script>
+      // Map of group names to their FeatureGroup layer objects
+      var groupLayers = {{
+        {map_entries}
+      }};
+
+      function applyFilters() {{
+        var checked = Array.from(
+          document.querySelectorAll('.filter-group:checked')
+        ).map(chk => chk.value);
+
+        var minY = parseInt(document.getElementById('year-min').value, 10);
+        var maxY = parseInt(document.getElementById('year-max').value, 10);
+
+        // For each group, show or hide its entire layer
+        Object.keys(groupLayers).forEach(function(grp) {{
+          var layer = groupLayers[grp];
+          if (checked.includes(grp)) {{
+            if (!map.hasLayer(layer)) map.addLayer(layer);
+          }} else {{
+            if (map.hasLayer(layer)) map.removeLayer(layer);
+          }}
+        }});
+      }}
+
+      document.getElementById('apply-filters')
+              .onclick = applyFilters;
+    </script>
+    """
+    m.get_root().html.add_child(folium.Element(filter_script))
 
     return m
 
 def main():
-    SHEET_ID = "1obKjWhdnJhK3f6qImN0DrQJEBZP-YigvjrU128QkjMM"
-    WORKSHEET = "Data"
+    SHEET_ID   = "1obKjWhdnJhK3f6qImN0DrQJEBZP-YigvjrU128QkjMM"
+    WORKSHEET  = "Data"
 
     df = load_sheet_to_df(SHEET_ID, WORKSHEET)
     print(f"✅ Loaded {len(df)} rows.")
