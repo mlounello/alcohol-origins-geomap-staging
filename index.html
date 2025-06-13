@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_b824d59d34ce501b80ca8b7448391184 {
+                #map_94678710552313ff7854db797c389230 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -54,14 +54,67 @@
 <body>
     
     
-            <div class="folium-map" id="map_b824d59d34ce501b80ca8b7448391184" ></div>
+    <div id="filter-sidebar" style="
+      position: fixed; top: 50px; left: 10px;
+      background: white; padding: 10px;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+      z-index: 9999; width: 180px;
+    ">
+      <h4>Filters</h4>
+      <b>Group</b><br>
+      <input type="checkbox" class="filter-group" value="Grain" checked> Grain<br>
+<input type="checkbox" class="filter-group" value="Grape" checked> Grape<br>
+<input type="checkbox" class="filter-group" value="Sugar" checked> Sugar<br>
+<input type="checkbox" class="filter-group" value="Cactus" checked> Cactus<br>
+      <hr>
+      <b>Year Range</b><br>
+      <input id="year-min" type="number" value="-5000" style="width:70px;"> to
+      <input id="year-max" type="number" value="2000" style="width:70px;"><br>
+      <button id="apply-filters">Apply Filters</button>
+    </div>
+    
+    
+    <script>
+      // Map of group names to their FeatureGroup layer objects
+      var groupLayers = {
+        'Grain': feature_group_28213cbd2176f91fb1234834cf8deaf4,
+  'Grape': feature_group_81d4fa0a53191cd0cb9da0ba35076d58,
+  'Sugar': feature_group_77e40b6d3b0ed9a4518fb159fc3b5c14,
+  'Cactus': feature_group_ea3419ebcf2cbb8bcccf782bcacfee85
+      };
+
+      function applyFilters() {
+        var checked = Array.from(
+          document.querySelectorAll('.filter-group:checked')
+        ).map(chk => chk.value);
+
+        var minY = parseInt(document.getElementById('year-min').value, 10);
+        var maxY = parseInt(document.getElementById('year-max').value, 10);
+
+        // For each group, show or hide its entire layer
+        Object.keys(groupLayers).forEach(function(grp) {
+          var layer = groupLayers[grp];
+          if (checked.includes(grp)) {
+            if (!map.hasLayer(layer)) map.addLayer(layer);
+          } else {
+            if (map.hasLayer(layer)) map.removeLayer(layer);
+          }
+        });
+      }
+
+      document.getElementById('apply-filters')
+              .onclick = applyFilters;
+    </script>
+    
+    
+            <div class="folium-map" id="map_94678710552313ff7854db797c389230" ></div>
         
 </body>
 <script>
     
     
-            var map_b824d59d34ce501b80ca8b7448391184 = L.map(
-                "map_b824d59d34ce501b80ca8b7448391184",
+            var map_94678710552313ff7854db797c389230 = L.map(
+                "map_94678710552313ff7854db797c389230",
                 {
                     center: [29.2087125, 61.781000000000006],
                     crs: L.CRS.EPSG3857,
@@ -78,7 +131,7 @@
 
         
     
-            var tile_layer_912d3ba17b686c8e07fd0366fa54722b = L.tileLayer(
+            var tile_layer_b178a4403eeec17d6a4c9a8a303039a5 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
@@ -95,10 +148,10 @@
             );
         
     
-            tile_layer_912d3ba17b686c8e07fd0366fa54722b.addTo(map_b824d59d34ce501b80ca8b7448391184);
+            tile_layer_b178a4403eeec17d6a4c9a8a303039a5.addTo(map_94678710552313ff7854db797c389230);
         
     
-            var tile_layer_a846d9111a8d3de21f579f6d03996b7a = L.tileLayer(
+            var tile_layer_44a8d2bf7d589e0781e0c23e94fa9b17 = L.tileLayer(
                 "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
                 {
   "minZoom": 0,
@@ -115,16 +168,16 @@
             );
         
     
-            tile_layer_a846d9111a8d3de21f579f6d03996b7a.addTo(map_b824d59d34ce501b80ca8b7448391184);
+            tile_layer_44a8d2bf7d589e0781e0c23e94fa9b17.addTo(map_94678710552313ff7854db797c389230);
         
     
-            var feature_group_dce334b6da38567042c93f28379e56cd = L.featureGroup(
+            var feature_group_f972da150921c23a6cd970e73ae1185c = L.featureGroup(
                 {
 }
             );
         
     
-            var tile_layer_c38de548523fa3d51443f6d32d3560cc = L.tileLayer(
+            var tile_layer_322b1e2b43133895f8af3c74291887b7 = L.tileLayer(
                 "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
                 {
   "minZoom": 0,
@@ -141,10 +194,10 @@
             );
         
     
-            tile_layer_c38de548523fa3d51443f6d32d3560cc.addTo(feature_group_dce334b6da38567042c93f28379e56cd);
+            tile_layer_322b1e2b43133895f8af3c74291887b7.addTo(feature_group_f972da150921c23a6cd970e73ae1185c);
         
     
-            var tile_layer_0ba28b1fe07fc5750dce77f676fd0c4e = L.tileLayer(
+            var tile_layer_83c95c5dbe962342c65616a7d4b4d29e = L.tileLayer(
                 "https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
                 {
   "minZoom": 0,
@@ -161,197 +214,197 @@
             );
         
     
-            tile_layer_0ba28b1fe07fc5750dce77f676fd0c4e.addTo(feature_group_dce334b6da38567042c93f28379e56cd);
+            tile_layer_83c95c5dbe962342c65616a7d4b4d29e.addTo(feature_group_f972da150921c23a6cd970e73ae1185c);
         
     
-            feature_group_dce334b6da38567042c93f28379e56cd.addTo(map_b824d59d34ce501b80ca8b7448391184);
+            feature_group_f972da150921c23a6cd970e73ae1185c.addTo(map_94678710552313ff7854db797c389230);
         
     
-            var feature_group_3891433491075b4702c64f9075f3bacc = L.featureGroup(
+            var feature_group_28213cbd2176f91fb1234834cf8deaf4 = L.featureGroup(
                 {
 }
             );
         
     
-            var circle_marker_c5d2f881da8bbb1173016ab5ec0b2552 = L.circleMarker(
+            var circle_marker_9cf1155be0872e608b64cf85fa49a20c = L.circleMarker(
                 [26.8206, 30.8025],
                 {"bubblingMouseEvents": true, "color": "#f9d81b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f9d81b", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
-            ).addTo(feature_group_3891433491075b4702c64f9075f3bacc);
+            ).addTo(feature_group_28213cbd2176f91fb1234834cf8deaf4);
         
     
-        var popup_dad707ad03316f01253ed2d8822a376d = L.popup({
+        var popup_f3b4f3dbfc2cea99f4996f3368c3d546 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_240858afafe8892dc31973bdec4f4f6d = $(`<div id="html_240858afafe8892dc31973bdec4f4f6d" style="width: 100.0%; height: 100.0%;"><strong>beer_ancient_egypt</strong><br>beer / Grain / 3500 BCE<br>Earliest known evidence of beer production in ancient Egypt.<br></div>`)[0];
-                popup_dad707ad03316f01253ed2d8822a376d.setContent(html_240858afafe8892dc31973bdec4f4f6d);
+                var html_344b6fe51e4884ca40caa0e1866dd691 = $(`<div id="html_344b6fe51e4884ca40caa0e1866dd691" style="width: 100.0%; height: 100.0%;"><strong>beer_ancient_egypt</strong><br>beer / Grain / 3500 BCE<br>Earliest known evidence of beer production in ancient Egypt.<br></div>`)[0];
+                popup_f3b4f3dbfc2cea99f4996f3368c3d546.setContent(html_344b6fe51e4884ca40caa0e1866dd691);
             
         
 
-        circle_marker_c5d2f881da8bbb1173016ab5ec0b2552.bindPopup(popup_dad707ad03316f01253ed2d8822a376d)
+        circle_marker_9cf1155be0872e608b64cf85fa49a20c.bindPopup(popup_f3b4f3dbfc2cea99f4996f3368c3d546)
         ;
 
         
     
     
-            var poly_line_d0743b1e2889f317a1a454a392da02d4 = L.polyline(
+            var poly_line_f01de97149f3246d18a831b15073b3ef = L.polyline(
                 [[26.8206, 30.8025], [36.12, 44.365]],
-                {"bubblingMouseEvents": true, "color": "#f9d81b", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f9d81b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 25, "smoothFactor": 1.0, "stroke": true, "weight": 3}
-            ).addTo(feature_group_3891433491075b4702c64f9075f3bacc);
+                {"bubblingMouseEvents": true, "color": "#f9d81b", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f9d81b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(feature_group_28213cbd2176f91fb1234834cf8deaf4);
         
     
-            var circle_marker_ffa8c519968a5f818d84c187339c7274 = L.circleMarker(
+            var circle_marker_fe89dcd19ede2eb825db598c1b72be06 = L.circleMarker(
                 [36.12, 44.365],
                 {"bubblingMouseEvents": true, "color": "#f9d81b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f9d81b", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 10, "stroke": true, "weight": 3}
-            ).addTo(feature_group_3891433491075b4702c64f9075f3bacc);
+            ).addTo(feature_group_28213cbd2176f91fb1234834cf8deaf4);
         
     
-        var popup_3a890164abba80c81ed7dc5d8fbf83fb = L.popup({
+        var popup_390ec7cddea7453f306ea6d91a92204f = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_f15617de75580295bbe75597e1e25cd8 = $(`<div id="html_f15617de75580295bbe75597e1e25cd8" style="width: 100.0%; height: 100.0%;"><strong>beer_mesopotamia</strong><br>beer / Grain / 3400 BCE<br>The earliest confirmed written evidence of beer in Mesopotamia dates back to around 3400 BCE. This evidence includes organic residue found in ceramic vessels, particularly at the site of Godin Tepe in modern-day Iran.<br></div>`)[0];
-                popup_3a890164abba80c81ed7dc5d8fbf83fb.setContent(html_f15617de75580295bbe75597e1e25cd8);
+                var html_4e8f490c75af271758abc89d871bef67 = $(`<div id="html_4e8f490c75af271758abc89d871bef67" style="width: 100.0%; height: 100.0%;"><strong>beer_mesopotamia</strong><br>beer / Grain / 3400 BCE<br>The earliest confirmed written evidence of beer in Mesopotamia dates back to around 3400 BCE. This evidence includes organic residue found in ceramic vessels, particularly at the site of Godin Tepe in modern-day Iran.<br></div>`)[0];
+                popup_390ec7cddea7453f306ea6d91a92204f.setContent(html_4e8f490c75af271758abc89d871bef67);
             
         
 
-        circle_marker_ffa8c519968a5f818d84c187339c7274.bindPopup(popup_3a890164abba80c81ed7dc5d8fbf83fb)
+        circle_marker_fe89dcd19ede2eb825db598c1b72be06.bindPopup(popup_390ec7cddea7453f306ea6d91a92204f)
         ;
 
         
     
     
-            var poly_line_f790f1a7dc92734505d79564739515e9 = L.polyline(
+            var poly_line_2ba7f83a6a797d7d800292d3d294f049 = L.polyline(
                 [[26.8206, 30.8025], [35.798, 36.798]],
-                {"bubblingMouseEvents": true, "color": "#f9d81b", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f9d81b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 25, "smoothFactor": 1.0, "stroke": true, "weight": 3}
-            ).addTo(feature_group_3891433491075b4702c64f9075f3bacc);
+                {"bubblingMouseEvents": true, "color": "#f9d81b", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#f9d81b", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 0.6, "smoothFactor": 1.0, "stroke": true, "weight": 2}
+            ).addTo(feature_group_28213cbd2176f91fb1234834cf8deaf4);
         
     
-            var circle_marker_2a10d7494f457b3ed225925ec3cc7891 = L.circleMarker(
+            var circle_marker_992acf921c9090c7e43ec4e3f2cc21e6 = L.circleMarker(
                 [35.798, 36.798],
                 {"bubblingMouseEvents": true, "color": "#f9d81b", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#f9d81b", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 9, "stroke": true, "weight": 3}
-            ).addTo(feature_group_3891433491075b4702c64f9075f3bacc);
+            ).addTo(feature_group_28213cbd2176f91fb1234834cf8deaf4);
         
     
-        var popup_90b7bfd6982fe7dadb37c3c8868f08c4 = L.popup({
+        var popup_4fa1f3223d6fba9fd51cb2bb6920d97b = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_51a9bac71016d36f2d837e17929509b4 = $(`<div id="html_51a9bac71016d36f2d837e17929509b4" style="width: 100.0%; height: 100.0%;"><strong>beer_syria</strong><br>beer / Grain / 2500 BCE<br>Documentation found in the Elba Tablets. Brewers were typically priestesses.<br></div>`)[0];
-                popup_90b7bfd6982fe7dadb37c3c8868f08c4.setContent(html_51a9bac71016d36f2d837e17929509b4);
+                var html_573b8d3342353649173a2a1d89dd2026 = $(`<div id="html_573b8d3342353649173a2a1d89dd2026" style="width: 100.0%; height: 100.0%;"><strong>beer_syria</strong><br>beer / Grain / 2500 BCE<br>Documentation found in the Elba Tablets. Brewers were typically priestesses.<br></div>`)[0];
+                popup_4fa1f3223d6fba9fd51cb2bb6920d97b.setContent(html_573b8d3342353649173a2a1d89dd2026);
             
         
 
-        circle_marker_2a10d7494f457b3ed225925ec3cc7891.bindPopup(popup_90b7bfd6982fe7dadb37c3c8868f08c4)
+        circle_marker_992acf921c9090c7e43ec4e3f2cc21e6.bindPopup(popup_4fa1f3223d6fba9fd51cb2bb6920d97b)
         ;
 
         
     
     
-            feature_group_3891433491075b4702c64f9075f3bacc.addTo(map_b824d59d34ce501b80ca8b7448391184);
+            feature_group_28213cbd2176f91fb1234834cf8deaf4.addTo(map_94678710552313ff7854db797c389230);
         
     
-            var feature_group_db0b1c2b53fb0caf364d302f752c1934 = L.featureGroup(
+            var feature_group_81d4fa0a53191cd0cb9da0ba35076d58 = L.featureGroup(
                 {
 }
             );
         
     
-            var circle_marker_2fd8875af7e8fb12c55041b90f78c1b5 = L.circleMarker(
+            var circle_marker_9e283487876343569165d23c56f6d6b6 = L.circleMarker(
                 [41.3182, 44.6851],
                 {"bubblingMouseEvents": true, "color": "#75147c", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#75147c", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12, "stroke": true, "weight": 3}
-            ).addTo(feature_group_db0b1c2b53fb0caf364d302f752c1934);
+            ).addTo(feature_group_81d4fa0a53191cd0cb9da0ba35076d58);
         
     
-        var popup_dbb4759fe40e3eb299f13868024e767b = L.popup({
+        var popup_77836e9f6b0b38bf4e773c9e65f48589 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_a66885b08f43e02ad07f50f03307fcaa = $(`<div id="html_a66885b08f43e02ad07f50f03307fcaa" style="width: 100.0%; height: 100.0%;"><strong>wine_georgia</strong><br>wine / Grape / 6000 BCE<br>Evidence of the world's earliest winemaking was uncovered by a series of excavations in the modern-day nation of Georgia. Fragments of pottery from two neolithic villages were examined and revealed traces of tartaric acid, which is found in grapes in large quantities. The teams of excavators note that while it is possible that the containers simply stored grapes or juice, anything of the sort would have degraded without a trace, or fermented within a matter of days.<br>https://www.theguardian.com/science/2017/nov/13/evidence-of-worlds-earliest-winemaking-uncovered-by-archaeologists</div>`)[0];
-                popup_dbb4759fe40e3eb299f13868024e767b.setContent(html_a66885b08f43e02ad07f50f03307fcaa);
+                var html_ee683387bd3707c846210f4ce965b07b = $(`<div id="html_ee683387bd3707c846210f4ce965b07b" style="width: 100.0%; height: 100.0%;"><strong>wine_georgia</strong><br>wine / Grape / 6000 BCE<br>Evidence of the world's earliest winemaking was uncovered by a series of excavations in the modern-day nation of Georgia. Fragments of pottery from two neolithic villages were examined and revealed traces of tartaric acid, which is found in grapes in large quantities. The teams of excavators note that while it is possible that the containers simply stored grapes or juice, anything of the sort would have degraded without a trace, or fermented within a matter of days.<br>https://www.theguardian.com/science/2017/nov/13/evidence-of-worlds-earliest-winemaking-uncovered-by-archaeologists</div>`)[0];
+                popup_77836e9f6b0b38bf4e773c9e65f48589.setContent(html_ee683387bd3707c846210f4ce965b07b);
             
         
 
-        circle_marker_2fd8875af7e8fb12c55041b90f78c1b5.bindPopup(popup_dbb4759fe40e3eb299f13868024e767b)
+        circle_marker_9e283487876343569165d23c56f6d6b6.bindPopup(popup_77836e9f6b0b38bf4e773c9e65f48589)
         ;
 
         
     
     
-            var circle_marker_208c684c06aaf8834f943e54e519676c = L.circleMarker(
+            var circle_marker_5680fa35563c26907fe0b139969a207e = L.circleMarker(
                 [33.6129, 113.6674],
                 {"bubblingMouseEvents": true, "color": "#75147c", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#75147c", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12, "stroke": true, "weight": 3}
-            ).addTo(feature_group_db0b1c2b53fb0caf364d302f752c1934);
+            ).addTo(feature_group_81d4fa0a53191cd0cb9da0ba35076d58);
         
     
-        var popup_8aae4bb8cb5e8ad8090bfd113310dd2d = L.popup({
+        var popup_ae8d7221752c222dc257de192748d7cc = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_eb403fef2d76f46009cb5d0d05e9526f = $(`<div id="html_eb403fef2d76f46009cb5d0d05e9526f" style="width: 100.0%; height: 100.0%;"><strong>wine_china</strong><br>wine / Grape / 7000 BCE<br>The Ancient Chinese were producing fermented drinks that were similar to a wine. They weren't technically a wine, as they were made from rice, honey, and fruit. Scientists concluded this from examining residues of the ancient shards of pottery from a Stage Age site in north China.<br>https://phys.org/news/2004-12-chinese-people-wine-years.html#:~:text=Physical%20evidence%20have%20recently%20confirmed,the%20oldest%20playable%20instruments%2D%2D</div>`)[0];
-                popup_8aae4bb8cb5e8ad8090bfd113310dd2d.setContent(html_eb403fef2d76f46009cb5d0d05e9526f);
+                var html_2f32edb6a35b6851fa60c2bf08e92644 = $(`<div id="html_2f32edb6a35b6851fa60c2bf08e92644" style="width: 100.0%; height: 100.0%;"><strong>wine_china</strong><br>wine / Grape / 7000 BCE<br>The Ancient Chinese were producing fermented drinks that were similar to a wine. They weren't technically a wine, as they were made from rice, honey, and fruit. Scientists concluded this from examining residues of the ancient shards of pottery from a Stage Age site in north China.<br>https://phys.org/news/2004-12-chinese-people-wine-years.html#:~:text=Physical%20evidence%20have%20recently%20confirmed,the%20oldest%20playable%20instruments%2D%2D</div>`)[0];
+                popup_ae8d7221752c222dc257de192748d7cc.setContent(html_2f32edb6a35b6851fa60c2bf08e92644);
             
         
 
-        circle_marker_208c684c06aaf8834f943e54e519676c.bindPopup(popup_8aae4bb8cb5e8ad8090bfd113310dd2d)
+        circle_marker_5680fa35563c26907fe0b139969a207e.bindPopup(popup_ae8d7221752c222dc257de192748d7cc)
         ;
 
         
     
     
-            feature_group_db0b1c2b53fb0caf364d302f752c1934.addTo(map_b824d59d34ce501b80ca8b7448391184);
+            feature_group_81d4fa0a53191cd0cb9da0ba35076d58.addTo(map_94678710552313ff7854db797c389230);
         
     
-            var feature_group_5be2aa70ebb3503d4f86cecdc825d973 = L.featureGroup(
+            var feature_group_77e40b6d3b0ed9a4518fb159fc3b5c14 = L.featureGroup(
                 {
 }
             );
         
     
-            feature_group_5be2aa70ebb3503d4f86cecdc825d973.addTo(map_b824d59d34ce501b80ca8b7448391184);
+            feature_group_77e40b6d3b0ed9a4518fb159fc3b5c14.addTo(map_94678710552313ff7854db797c389230);
         
     
-            var feature_group_87c9f254858e28fd30c5ae12a125e0f9 = L.featureGroup(
+            var feature_group_ea3419ebcf2cbb8bcccf782bcacfee85 = L.featureGroup(
                 {
 }
             );
         
     
-            feature_group_87c9f254858e28fd30c5ae12a125e0f9.addTo(map_b824d59d34ce501b80ca8b7448391184);
+            feature_group_ea3419ebcf2cbb8bcccf782bcacfee85.addTo(map_94678710552313ff7854db797c389230);
         
     
-            var layer_control_87ef87ceb240f3d4742603ae178d1d91_layers = {
+            var layer_control_c84f81a3844f32c9e5764b0a9724ed15_layers = {
                 base_layers : {
-                    "Street (English)" : tile_layer_912d3ba17b686c8e07fd0366fa54722b,
-                    "Satellite" : tile_layer_a846d9111a8d3de21f579f6d03996b7a,
-                    "Hybrid (Satellite + Labels)" : feature_group_dce334b6da38567042c93f28379e56cd,
+                    "Street (English)" : tile_layer_b178a4403eeec17d6a4c9a8a303039a5,
+                    "Satellite" : tile_layer_44a8d2bf7d589e0781e0c23e94fa9b17,
+                    "Hybrid (Satellite + Labels)" : feature_group_f972da150921c23a6cd970e73ae1185c,
                 },
                 overlays :  {
-                    "\u003cspan style=\"background:#f9d81b;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eGrain" : feature_group_3891433491075b4702c64f9075f3bacc,
-                    "\u003cspan style=\"background:#75147c;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eGrape" : feature_group_db0b1c2b53fb0caf364d302f752c1934,
-                    "\u003cspan style=\"background:#FFFFFF;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eSugar" : feature_group_5be2aa70ebb3503d4f86cecdc825d973,
-                    "\u003cspan style=\"background:#367c21;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eCactus" : feature_group_87c9f254858e28fd30c5ae12a125e0f9,
+                    "\u003cspan style=\"background:#f9d81b;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eGrain" : feature_group_28213cbd2176f91fb1234834cf8deaf4,
+                    "\u003cspan style=\"background:#75147c;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eGrape" : feature_group_81d4fa0a53191cd0cb9da0ba35076d58,
+                    "\u003cspan style=\"background:#FFFFFF;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eSugar" : feature_group_77e40b6d3b0ed9a4518fb159fc3b5c14,
+                    "\u003cspan style=\"background:#367c21;width:12px;height:12px;display:inline-block;margin-right:6px;border:1px solid #000;\"\u003e\u003c/span\u003eCactus" : feature_group_ea3419ebcf2cbb8bcccf782bcacfee85,
                 },
             };
-            let layer_control_87ef87ceb240f3d4742603ae178d1d91 = L.control.layers(
-                layer_control_87ef87ceb240f3d4742603ae178d1d91_layers.base_layers,
-                layer_control_87ef87ceb240f3d4742603ae178d1d91_layers.overlays,
+            let layer_control_c84f81a3844f32c9e5764b0a9724ed15 = L.control.layers(
+                layer_control_c84f81a3844f32c9e5764b0a9724ed15_layers.base_layers,
+                layer_control_c84f81a3844f32c9e5764b0a9724ed15_layers.overlays,
                 {
   "position": "bottomleft",
   "collapsed": false,
   "autoZIndex": true,
 }
-            ).addTo(map_b824d59d34ce501b80ca8b7448391184);
+            ).addTo(map_94678710552313ff7854db797c389230);
 
         
 </script>
